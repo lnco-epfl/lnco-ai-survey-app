@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { FormControlLabel, Switch } from '@mui/material';
 import Stack from '@mui/material/Stack';
 
-import { FullScreenSetting } from '@/modules/config/AppSettings';
+import { FullScreenSettings } from '@/modules/config/AppSettings';
 
 type FullScreenSettingsViewProps = {
-  fullScreenSettings: FullScreenSetting;
-  onChange: (newSetting: FullScreenSetting) => void;
+  fullScreenSettings: FullScreenSettings;
+  onChange: (newSetting: FullScreenSettings) => void;
 };
 
 const FullScreenSettingsView: FC<FullScreenSettingsViewProps> = ({

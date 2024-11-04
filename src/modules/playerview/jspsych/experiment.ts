@@ -1,5 +1,7 @@
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 // eslint-disable-next-line import/no-extraneous-dependencies
+import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import jsPsychSurvey from '@jspsych/plugin-survey';
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import '@jspsych/plugin-survey/css/survey.css';
@@ -42,6 +44,7 @@ const buildTimelineFromSurvey = (sections: Section[]): Timeline => {
             rows: 1,
             isRequired: element.mandatory,
             inputType: element.answerType,
+            placeholder: 'Your Answer',
           });
           break;
 
@@ -131,6 +134,26 @@ const getFullScreenTrial = (): Trial => ({
   fullscreen_mode: true,
 });
 
+/**
+ *
+ * @returns Returns a simple welcome screen that automatically triggers fullscreen when the start button is pressed
+ */
+const getEndPage = (
+  jspsych: JsPsych,
+  title: string,
+  description: string,
+  link: string,
+  onFinish: (data: DataCollection, settings: AppSettings) => void,
+  input: AppSettings,
+): Trial => ({
+  type: htmlKeyboardResponse,
+  choices: 'NO_KEYS',
+  stimulus: `<div class='sd-html'><h5>${title}</h5><p>${description}</p><a class='link-to-experiment' href=${link}>Click here to go to the experiment</a></div>`,
+  on_start: (): void => {
+    onFinish(jspsych.data.get(), input);
+  },
+});
+
 export async function run({
   input,
   onFinish,
@@ -157,6 +180,19 @@ export async function run({
       onFinish(jsPsych.data.get(), input);
     },
   });
+
+  if (input.nextStepSettings.linkToNextPage) {
+    jsPsychTimeline.push(
+      getEndPage(
+        jsPsych,
+        input.nextStepSettings.title,
+        input.nextStepSettings.description,
+        input.nextStepSettings.link,
+        onFinish,
+        input,
+      ),
+    );
+  }
 
   await jsPsych.run(jsPsychTimeline);
 

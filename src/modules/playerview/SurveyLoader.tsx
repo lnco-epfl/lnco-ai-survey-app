@@ -11,7 +11,8 @@ import { run } from './jspsych/experiment';
 
 const SurveyLoader: FC = () => {
   const jsPsychRef = useRef<null | Promise<JsPsych>>(null);
-  const { fullScreenSettings, sectionSettings } = useSettings();
+  const { fullScreenSettings, nextStepSettings, sectionSettings } =
+    useSettings();
   const { mutate: postAppData } = mutations.usePostAppData();
 
   const onFinish = useCallback(
@@ -27,7 +28,7 @@ const SurveyLoader: FC = () => {
   useEffect(() => {
     if (!jsPsychRef.current) {
       jsPsychRef.current = run({
-        input: { fullScreenSettings, sectionSettings },
+        input: { fullScreenSettings, nextStepSettings, sectionSettings },
         onFinish,
       });
     }

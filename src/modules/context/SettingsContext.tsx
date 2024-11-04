@@ -17,10 +17,20 @@ const defaultSettingsValues: AllSettingsType = {
     fullScreen: false,
     pagePerQuestion: true,
   },
+  nextStepSettings: {
+    linkToNextPage: false,
+    title: '',
+    description: '',
+    link: '',
+  },
 };
 
 // list of the settings names
-const ALL_SETTING_NAMES = ['sectionSettings', 'fullScreenSettings'] as const;
+const ALL_SETTING_NAMES = [
+  'sectionSettings',
+  'fullScreenSettings',
+  'nextStepSettings',
+] as const;
 
 // automatically generated types
 type AllSettingsNameType = (typeof ALL_SETTING_NAMES)[number];

@@ -1,6 +1,7 @@
 export type AppSettings = {
   sectionSettings: SectionSettings;
-  fullScreenSettings: FullScreenSetting;
+  fullScreenSettings: FullScreenSettings;
+  nextStepSettings: NextStepSettings;
 };
 
 export type SectionSettings = {
@@ -78,7 +79,14 @@ export type TextElement = {
 
 export type SurveyElement = Question | TextElement;
 
-export type FullScreenSetting = {
+export type FullScreenSettings = {
   fullScreen: boolean;
   pagePerQuestion: boolean;
+};
+
+export type NextStepSettings = {
+  linkToNextPage: boolean;
+  title: string;
+  description: string;
+  link: string;
 };

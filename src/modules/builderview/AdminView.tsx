@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Tab } from '@mui/material';
 
+import ResultsView from './results/ResultsView';
 import SettingsView from './settings/SettingView';
 
 enum Tabs {
@@ -31,7 +32,9 @@ const AdminView: FC = () => {
             iconPosition="start"
           />
         </TabList>
-        <TabPanel value={Tabs.TABLE_VIEW}>Test</TabPanel>
+        <TabPanel value={Tabs.TABLE_VIEW}>
+          <ResultsView />
+        </TabPanel>
         <TabPanel value={Tabs.SETTINGS_VIEW}>
           <SettingsView />
         </TabPanel>

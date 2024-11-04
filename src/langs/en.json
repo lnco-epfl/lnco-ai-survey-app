@@ -23,6 +23,13 @@
         "LABEL_FULL_SCREEN": "Display Full Screen",
         "LABEL_PAGE_PER_QUESTION": "Display each question on a new page"
       },
+      "NEXT_STEP": {
+        "TITLE_LABEL": "Title",
+        "DESCRIPTION_LABEL": "Description",
+        "LINK_LABEL": "Link",
+        "LABEL_NEXT_STEP": "Do you want to link the next step?",
+        "LINK_PAGE_LABEL": "Link Page Content"
+      },
       "SECTIONS": {
         "MANDATORY_LABEL": "Mandatory",
         "QUESTION_LABEL": "Question",

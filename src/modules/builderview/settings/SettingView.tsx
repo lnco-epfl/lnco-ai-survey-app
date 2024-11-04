@@ -8,12 +8,14 @@ import Stack from '@mui/material/Stack';
 import { isEqual } from 'lodash';
 
 import {
-  FullScreenSetting,
+  FullScreenSettings,
+  NextStepSettings,
   SectionSettings,
 } from '@/modules/config/AppSettings';
 import { useSettings } from '@/modules/context/SettingsContext';
 
 import FullScreenSettingsView from './FullScreenSettingsView';
+import NextStepSettingsView from './NextStepSettingsView';
 import SectionSettingsView from './SectionSettingsView';
 
 const SettingsView: FC = () => {
@@ -23,34 +25,47 @@ const SettingsView: FC = () => {
   const {
     sectionSettings: sectionSavedState,
     fullScreenSettings: fullScreenSavedState,
+    nextStepSettings: nextStepSettingsSavedState,
     saveSettings,
   } = useSettings();
 
   const [sections, setSections] = useState<SectionSettings>(sectionSavedState);
   const [fullScreenSettings, setFullScreenSettings] =
-    useState<FullScreenSetting>(fullScreenSavedState);
+    useState<FullScreenSettings>(fullScreenSavedState);
+  const [nextStepSettings, setNextStepSettings] = useState<NextStepSettings>(
+    nextStepSettingsSavedState,
+  );
 
   const saveAllSettings = (): void => {
     saveSettings('sectionSettings', sections);
+    saveSettings('nextStepSettings', nextStepSettings);
     saveSettings('fullScreenSettings', fullScreenSettings);
   };
 
   const disableSave = useMemo(() => {
     if (
       isEqual(sectionSavedState, sections) &&
-      isEqual(fullScreenSavedState, fullScreenSettings)
+      isEqual(fullScreenSavedState, fullScreenSettings) &&
+      isEqual(nextStepSettingsSavedState, nextStepSettings)
     ) {
       return true;
     }
     return false;
-  }, [sectionSavedState, sections, fullScreenSavedState, fullScreenSettings]);
+  }, [
+    sectionSavedState,
+    sections,
+    fullScreenSavedState,
+    fullScreenSettings,
+    nextStepSettingsSavedState,
+    nextStepSettings,
+  ]);
 
   return (
     <Stack spacing={2}>
       <Typography variant="h4">{t('TITLE')}</Typography>
       <FullScreenSettingsView
         fullScreenSettings={fullScreenSettings}
-        onChange={(newSetting: FullScreenSetting) => {
+        onChange={(newSetting: FullScreenSettings) => {
           setFullScreenSettings(newSetting);
         }}
       />
@@ -58,6 +73,12 @@ const SettingsView: FC = () => {
         sectionSettings={sections}
         onChange={(newSetting: SectionSettings) => {
           setSections(newSetting);
+        }}
+      />
+      <NextStepSettingsView
+        nextStepSettings={nextStepSettings}
+        onChange={(newSetting: NextStepSettings) => {
+          setNextStepSettings(newSetting);
         }}
       />
       <Box>
