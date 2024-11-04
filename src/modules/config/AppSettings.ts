@@ -6,6 +6,7 @@ export type AppSettings = {
 
 export type SectionSettings = {
   sections: Section[];
+  pageButtonSettings: PageButtonSettings;
 };
 
 export type Section = SurveyElement[];
@@ -78,6 +79,12 @@ export type TextElement = {
 };
 
 export type SurveyElement = Question | TextElement;
+
+export type PageButtonSettings = {
+  nextPageText: string;
+  previousPageText: string;
+  finishSurveyText: string;
+};
 
 export type FullScreenSettings = {
   fullScreen: boolean;

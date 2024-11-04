@@ -12,6 +12,11 @@ type AllSettingsType = AppSettings;
 const defaultSettingsValues: AllSettingsType = {
   sectionSettings: {
     sections: [[]],
+    pageButtonSettings: {
+      finishSurveyText: 'Submit',
+      nextPageText: 'Continue',
+      previousPageText: 'Previous',
+    },
   },
   fullScreenSettings: {
     fullScreen: false,

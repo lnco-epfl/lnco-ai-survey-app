@@ -57,7 +57,10 @@
         "LABEL_shortAnswer": "Short Answer",
         "LABEL_multipleChoice": "Multiple Choice",
         "LABEL_multiAnswer": "Multi Answer",
-        "LABEL_likertScale": "Lickert Scale"
+        "LABEL_likertScale": "Lickert Scale",
+        "NEXT_PAGE_LABEL": "Next Page Button Text",
+        "PREVIOUS_PAGE_LABEL": "Previous Page Button Text",
+        "FINISH_SURVEY_LABEL": "Finish Survey Button Text"
       }
     }
   }

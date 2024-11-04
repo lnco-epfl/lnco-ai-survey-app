@@ -1,3 +1,5 @@
+import { Input } from '@mui/material';
+
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
@@ -28,7 +30,10 @@ export type Pages = {
   type: string;
 } & Record<string, unknown>;
 
-const buildTimelineFromSurvey = (sections: Section[]): Timeline => {
+const buildTimelineFromSurvey = (
+  sections: Section[],
+  input: AppSettings,
+): Timeline => {
   const timeline: Timeline = [];
   const pages: Pages[] = [];
   sections.forEach((section) => {
@@ -111,9 +116,9 @@ const buildTimelineFromSurvey = (sections: Section[]): Timeline => {
     survey_json: {
       pages: pageJson,
       showQuestionNumbers: false,
-      completeText: 'Done!',
-      pageNextText: 'Continue',
-      pagePrevText: 'Previous',
+      completeText: input.sectionSettings.pageButtonSettings.finishSurveyText,
+      pageNextText: input.sectionSettings.pageButtonSettings.nextPageText,
+      pagePrevText: input.sectionSettings.pageButtonSettings.previousPageText,
       css: {
         isPanelless: true,
       },
@@ -168,7 +173,7 @@ export async function run({
   }
 
   jsPsychTimeline.push(
-    ...buildTimelineFromSurvey(input.sectionSettings.sections),
+    ...buildTimelineFromSurvey(input.sectionSettings.sections, input),
   );
 
   // Initialize jspsych

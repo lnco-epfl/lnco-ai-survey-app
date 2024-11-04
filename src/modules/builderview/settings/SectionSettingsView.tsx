@@ -19,6 +19,7 @@ import {
   MultiAnswer,
   MultipleChoice,
   OtherElementType,
+  PageButtonSettings,
   QuestionTypes,
   SectionSettings,
   ShortAnswer,
@@ -27,6 +28,7 @@ import {
   TextElement,
 } from '@/modules/config/AppSettings';
 
+import PageButtonSettingsView from './PageButtonSettingsView';
 import LikertScaleSettingsView from './questionviews/LickertScaleSettingsView';
 import LongAnswerSettingsView from './questionviews/LongAnswerSettingsView';
 import MultiAnswerSettingsView from './questionviews/MultiAnswerSettingsView';
@@ -46,7 +48,7 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
   const { t } = useTranslation('translations', {
     keyPrefix: 'SETTINGS.SECTIONS',
   });
-  const { sections } = sectionSettings;
+  const { sections, pageButtonSettings } = sectionSettings;
 
   // Function to handle adding a new item
   const handleAddNewItem = (
@@ -123,15 +125,16 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
       const updateSections = [...sections];
       updateSections[pageNr] = updatedItems;
       return {
+        pageButtonSettings,
         sections: updateSections,
       };
     }
-    return { sections };
+    return { pageButtonSettings, sections };
   };
 
   const handleAddNewPage = (): SectionSettings => {
     const newSections = [...sections, []];
-    return { sections: newSections };
+    return { pageButtonSettings, sections: newSections };
   };
 
   const onChangeQuestion = (
@@ -144,7 +147,7 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
       i === index ? newQuestion : question,
     );
     updatedSections[pageNr] = updatedQuestions;
-    onChange({ sections: updatedSections });
+    onChange({ pageButtonSettings, sections: updatedSections });
   };
 
   const onDeleteButtonClick = (index: number, pageNr: number): void => {
@@ -153,7 +156,7 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
       (question, i) => i !== index,
     );
     updatedSections[pageNr] = updatedQuestions;
-    onChange({ sections: updatedSections });
+    onChange({ pageButtonSettings, sections: updatedSections });
   };
 
   const onUpButtonClick = (
@@ -202,7 +205,7 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
 
       updatedSections[pageNr] = updatedQuestions; // Update the current section's questions
     }
-    onChange({ sections: updatedSections }); // Update the state
+    onChange({ pageButtonSettings, sections: updatedSections }); // Update the state
   };
 
   const onDownButtonClick = (
@@ -239,7 +242,7 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
 
       updatedSections[pageNr] = updatedQuestions; // Update the current section's questions
     }
-    onChange({ sections: updatedSections }); // Update the state
+    onChange({ pageButtonSettings, sections: updatedSections }); // Update the state
   };
 
   const elementHeaderArea = (
@@ -310,7 +313,7 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
 
   const onPageDeleteButtonClick = (pageNr: number): void => {
     const updatedSections = sections.filter((section, i) => i !== pageNr);
-    onChange({ sections: updatedSections });
+    onChange({ pageButtonSettings, sections: updatedSections });
   };
 
   const onPageUpButtonClick = (pageNr: number): void => {
@@ -319,7 +322,7 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
     const temp = updatedSections[pageNr - 1]; // Store the question above the current one
     updatedSections[pageNr - 1] = updatedSections[pageNr]; // Swap the current question up
     updatedSections[pageNr] = temp; // Swap the above question down
-    onChange({ sections: updatedSections }); // Update the state
+    onChange({ pageButtonSettings, sections: updatedSections }); // Update the state
   };
 
   const onPageDownButtonClick = (pageNr: number): void => {
@@ -329,7 +332,7 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
     const temp = updatedSections[pageNr + 1]; // Store the question above the current one
     updatedSections[pageNr + 1] = updatedSections[pageNr]; // Swap the current question up
     updatedSections[pageNr] = temp; // Swap the above question down
-    onChange({ sections: updatedSections }); // Update the state
+    onChange({ pageButtonSettings, sections: updatedSections }); // Update the state
   };
 
   const pageHeaderArea = (pageNr: number): ReactNode => (
@@ -554,6 +557,12 @@ const SectionSettingsView: FC<SectionSettingsViewProps> = ({
 
   return (
     <Stack spacing={2}>
+      <PageButtonSettingsView
+        onChange={(newPageButtonSettings: PageButtonSettings) =>
+          onChange({ sections, pageButtonSettings: newPageButtonSettings })
+        }
+        pageButtonSettings={pageButtonSettings}
+      />
       {getSectionsDisplay()}
       <Button variant="contained" onClick={() => onChange(handleAddNewPage())}>
         {t('ADD_PAGE')}
