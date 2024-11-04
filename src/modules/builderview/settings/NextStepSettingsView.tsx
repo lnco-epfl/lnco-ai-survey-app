@@ -28,7 +28,14 @@ const NextStepSettingsView: FC<NextStepSettingsViewProps> = ({
   const { t } = useTranslation('translations', {
     keyPrefix: 'SETTINGS.NEXT_STEP',
   });
-  const { linkToNextPage, title, description, link } = nextStepSettings;
+  const { linkToNextPage, title, description, link, linkText } =
+    nextStepSettings || {
+      linkToNextPage: false,
+      title: '',
+      description: '',
+      link: '',
+      linkText: '',
+    };
   return (
     <Stack spacing={1}>
       <FormControlLabel
@@ -73,6 +80,13 @@ const NextStepSettingsView: FC<NextStepSettingsViewProps> = ({
                 label={t('LINK_LABEL')}
                 onChange={(e) =>
                   onChange({ ...nextStepSettings, link: e.target.value })
+                }
+              />
+              <TextField
+                value={linkText}
+                label={t('LINK_TEXT_LABEL')}
+                onChange={(e) =>
+                  onChange({ ...nextStepSettings, linkText: e.target.value })
                 }
               />
             </Stack>

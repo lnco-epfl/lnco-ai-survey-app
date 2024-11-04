@@ -96,4 +96,5 @@ export type NextStepSettings = {
   title: string;
   description: string;
   link: string;
+  linkText: string;
 };

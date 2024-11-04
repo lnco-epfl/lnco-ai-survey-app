@@ -146,12 +146,13 @@ const getEndPage = (
   title: string,
   description: string,
   link: string,
+  linkText: string,
   onFinish: (data: DataCollection, settings: AppSettings) => void,
   input: AppSettings,
 ): Trial => ({
   type: htmlKeyboardResponse,
   choices: 'NO_KEYS',
-  stimulus: `<div class='sd-html'><h5>${title}</h5><p>${description}</p><a class='link-to-experiment' target="_parent" href=${link}>Click here to go to the experiment</a></div>`,
+  stimulus: `<div class='sd-html'><h5>${title}</h5><p>${description}</p><a class='link-to-experiment' target="_parent" href=${link}>${linkText}</a></div>`,
   on_start: (): void => {
     onFinish(jspsych.data.get(), input);
   },
@@ -191,6 +192,7 @@ export async function run({
         input.nextStepSettings.title,
         input.nextStepSettings.description,
         input.nextStepSettings.link,
+        input.nextStepSettings.linkText,
         onFinish,
         input,
       ),

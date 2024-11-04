@@ -27,6 +27,7 @@ const defaultSettingsValues: AllSettingsType = {
     title: '',
     description: '',
     link: '',
+    linkText: '',
   },
 };
 
