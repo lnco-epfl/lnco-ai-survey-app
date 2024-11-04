@@ -148,7 +148,7 @@ const getEndPage = (
 ): Trial => ({
   type: htmlKeyboardResponse,
   choices: 'NO_KEYS',
-  stimulus: `<div class='sd-html'><h5>${title}</h5><p>${description}</p><a class='link-to-experiment' href=${link}>Click here to go to the experiment</a></div>`,
+  stimulus: `<div class='sd-html'><h5>${title}</h5><p>${description}</p><a class='link-to-experiment' target="_parent" href=${link}>Click here to go to the experiment</a></div>`,
   on_start: (): void => {
     onFinish(jspsych.data.get(), input);
   },
