@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TextField } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 
 import { PageButtonSettings } from '@/modules/config/AppSettings';
@@ -19,10 +19,15 @@ const PageButtonSettingsView: FC<PageButtonSettingsViewProps> = ({
     keyPrefix: 'SETTINGS.SECTIONS',
   });
   const { finishSurveyText, nextPageText, previousPageText } =
-    pageButtonSettings;
+    pageButtonSettings || {
+      finishSurveyText: '',
+      nextPageText: '',
+      previousPageText: '',
+    };
 
   return (
     <Stack spacing={1}>
+      <Typography variant="h6">{t('PAGE_BUTTON_SETTINGS_HEADER')}</Typography>
       <TextField
         value={nextPageText}
         label={t('NEXT_PAGE_LABEL')}
