@@ -1,6 +1,13 @@
 //@import url(https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
 //@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
+html,
+body,
+#root,
+.player-view {
+  height: 100%;
+}
+
 h3 {
   font-size: 1.5rem;
   line-height: 1.8rem;
@@ -29,6 +36,7 @@ h1 {
   background-color: #fffefe;
   color: #313131;
   width: 100%;
+  height: 100%;
   flex-direction: column;
   overflow-y: auto;
   font-family: 'Nunito', 'Roboto', 'sans-serif' !important;
@@ -49,7 +57,7 @@ h1 {
 /* inner JsPsych content (no progress bar) */
 .jspsych-content {
   margin: 0 auto; /* this is for overflowing content */
-  width: 90%;
+  width: 75%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -136,8 +144,22 @@ h1 {
 }
 
 /** Form Styles **/
+.sd-root-modern {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 .jspsych-body {
   width: 100%;
+}
+
+.jspsych-page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-bottom: 40px;
 }
 
 /** Titles, text and questions **/
