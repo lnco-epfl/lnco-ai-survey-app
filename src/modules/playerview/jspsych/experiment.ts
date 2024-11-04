@@ -1,5 +1,3 @@
-import { Input } from '@mui/material';
-
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
