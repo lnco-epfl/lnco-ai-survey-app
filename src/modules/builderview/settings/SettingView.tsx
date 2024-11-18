@@ -10,7 +10,7 @@ import { isEqual } from 'lodash';
 import {
   FullScreenSettings,
   NextStepSettings,
-  SectionSettings,
+  SurveySettings,
 } from '@/modules/config/AppSettings';
 import { useSettings } from '@/modules/context/SettingsContext';
 
@@ -23,13 +23,15 @@ const SettingsView: FC = () => {
     keyPrefix: 'SETTINGS',
   });
   const {
-    sectionSettings: sectionSavedState,
+    surveySettings: surveySettingsSavedState,
     fullScreenSettings: fullScreenSavedState,
     nextStepSettings: nextStepSettingsSavedState,
     saveSettings,
   } = useSettings();
 
-  const [sections, setSections] = useState<SectionSettings>(sectionSavedState);
+  const [surveySettings, setSurveySettings] = useState<SurveySettings>(
+    surveySettingsSavedState,
+  );
   const [fullScreenSettings, setFullScreenSettings] =
     useState<FullScreenSettings>(fullScreenSavedState);
   const [nextStepSettings, setNextStepSettings] = useState<NextStepSettings>(
@@ -37,14 +39,14 @@ const SettingsView: FC = () => {
   );
 
   const saveAllSettings = (): void => {
-    saveSettings('sectionSettings', sections);
+    saveSettings('surveySettings', surveySettings);
     saveSettings('nextStepSettings', nextStepSettings);
     saveSettings('fullScreenSettings', fullScreenSettings);
   };
 
   const disableSave = useMemo(() => {
     if (
-      isEqual(sectionSavedState, sections) &&
+      isEqual(surveySettingsSavedState, surveySettings) &&
       isEqual(fullScreenSavedState, fullScreenSettings) &&
       isEqual(nextStepSettingsSavedState, nextStepSettings)
     ) {
@@ -52,8 +54,8 @@ const SettingsView: FC = () => {
     }
     return false;
   }, [
-    sectionSavedState,
-    sections,
+    surveySettings,
+    surveySettingsSavedState,
     fullScreenSavedState,
     fullScreenSettings,
     nextStepSettingsSavedState,
@@ -70,9 +72,9 @@ const SettingsView: FC = () => {
         }}
       />
       <SectionSettingsView
-        sectionSettings={sections}
-        onChange={(newSetting: SectionSettings) => {
-          setSections(newSetting);
+        surveySettings={surveySettings}
+        onChange={(newSetting: SurveySettings) => {
+          setSurveySettings(newSetting);
         }}
       />
       <NextStepSettingsView

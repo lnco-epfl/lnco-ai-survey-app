@@ -5,6 +5,7 @@ import { Context } from '@graasp/sdk';
 
 import i18n, { DEFAULT_LANGUAGE } from '../../config/i18n';
 import { SettingsProvider } from '../context/SettingsContext';
+import { SurveyResultsProvider } from '../context/SurveyContext';
 import AnalyticsView from './AnalyticsView';
 import BuilderView from './BuilderView';
 import PlayerView from './PlayerView';
@@ -34,7 +35,11 @@ const App = (): JSX.Element => {
     }
   };
 
-  return <SettingsProvider>{renderContent()}</SettingsProvider>;
+  return (
+    <SettingsProvider>
+      <SurveyResultsProvider>{renderContent()}</SurveyResultsProvider>
+    </SettingsProvider>
+  );
 };
 
 export default App;

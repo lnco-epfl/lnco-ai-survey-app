@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactQuill from 'react-quill';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
@@ -13,6 +12,20 @@ import {
   Typography,
 } from '@mui/material';
 import Stack from '@mui/material/Stack';
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  BlockTypeSelect,
+  BoldItalicUnderlineToggles,
+  ListsToggle,
+  MDXEditor,
+  UndoRedo,
+  headingsPlugin,
+  listsPlugin,
+  toolbarPlugin,
+} from '@mdxeditor/editor';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import '@mdxeditor/editor/style.css';
 
 import { NextStepSettings } from '@/modules/config/AppSettings';
 
@@ -60,20 +73,28 @@ const NextStepSettingsView: FC<NextStepSettingsViewProps> = ({
                   onChange({ ...nextStepSettings, title: e.target.value })
                 }
               />
-              <ReactQuill
-                value={description}
+              <MDXEditor
+                markdown={description}
                 onChange={(value) =>
                   onChange({ ...nextStepSettings, description: value })
                 }
-                theme="snow"
-                modules={{
-                  toolbar: [
-                    [{ header: [1, 2, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    ['link'],
-                  ],
-                }}
+                plugins={[
+                  headingsPlugin(),
+                  toolbarPlugin({
+                    toolbarClassName: 'my-classname',
+                    // eslint-disable-next-line react/no-unstable-nested-components
+                    toolbarContents: () => (
+                      <>
+                        {' '}
+                        <BlockTypeSelect />
+                        <UndoRedo />
+                        <BoldItalicUnderlineToggles />
+                        <ListsToggle />
+                      </>
+                    ),
+                  }),
+                  listsPlugin(),
+                ]}
               />
               <TextField
                 value={link}

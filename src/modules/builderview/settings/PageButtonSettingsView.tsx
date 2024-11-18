@@ -18,12 +18,17 @@ const PageButtonSettingsView: FC<PageButtonSettingsViewProps> = ({
   const { t } = useTranslation('translations', {
     keyPrefix: 'SETTINGS.SECTIONS',
   });
-  const { finishSurveyText, nextPageText, previousPageText } =
-    pageButtonSettings || {
-      finishSurveyText: '',
-      nextPageText: '',
-      previousPageText: '',
-    };
+  const {
+    finishSurveyText,
+    nextPageText,
+    previousPageText,
+    continueButtonDelay,
+  } = pageButtonSettings || {
+    finishSurveyText: '',
+    nextPageText: '',
+    previousPageText: '',
+    continueButtonDelay: 0,
+  };
 
   return (
     <Stack spacing={1}>
@@ -49,6 +54,22 @@ const PageButtonSettingsView: FC<PageButtonSettingsViewProps> = ({
           onChange({ ...pageButtonSettings, finishSurveyText: e.target.value })
         }
       />
+      <Stack spacing={1}>
+        <Typography variant="body1">
+          {t('CONTINUE_BUTTON_DELAY_DESCRIPTION')}
+        </Typography>
+        <TextField
+          value={continueButtonDelay}
+          label={t('CONTINUE_BUTTON_DELAY_LABEL')}
+          type="number"
+          onChange={(e) =>
+            onChange({
+              ...pageButtonSettings,
+              continueButtonDelay: Number(e.target.value),
+            })
+          }
+        />
+      </Stack>
     </Stack>
   );
 };
