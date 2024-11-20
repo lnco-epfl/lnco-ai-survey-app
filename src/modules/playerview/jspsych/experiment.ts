@@ -65,8 +65,8 @@ const buildTimelineFromSurvey = (
           type: jsPsychSurveyHtmlForm,
           preamble: `
           <div>
-            ${element.description ? `<h5>${element.description}</h5>` : ''}
             <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
+            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
           </div>`,
           html: `<input type="${element.answerType}" ${element.dataValidation?.min ? `min="${element.dataValidation?.min}"` : ''} ${element.dataValidation?.max ? `max="${element.dataValidation?.max}"` : ''} value="${result ? getResult(result, element.name) : ''}" name="${element.name}" id="task-input" ${element.mandatory ? 'required' : ''} /><br>`,
           on_finish(data: ResponseElement) {
@@ -85,8 +85,8 @@ const buildTimelineFromSurvey = (
           type: jsPsychSurveyHtmlForm,
           preamble: `
           <div>
-            ${element.description ? `<h5>${element.description}</h5>` : ''}
             <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
+            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
           </div>`,
           html: `<input value="${getResult(result, element.name)}" name="${element.name}" id="task-input" ${element.mandatory ? 'required' : ''} rows="5"><br>`,
           on_finish(data: ResponseElement) {
@@ -105,8 +105,8 @@ const buildTimelineFromSurvey = (
           type: jsPsychSurveyHtmlForm,
           preamble: `
           <div>
-            ${element.description ? `<h5>${element.description}</h5>` : ''}
             <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
+            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
           </div>`,
           html: `
           <div>
@@ -143,8 +143,8 @@ const buildTimelineFromSurvey = (
           type: jsPsychSurveyHtmlForm,
           preamble: `
           <div>
-            ${element.description ? `<h5>${element.description}</h5>` : ''}
             <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
+            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
           </div>`,
           html: `
             <div>
@@ -181,8 +181,8 @@ const buildTimelineFromSurvey = (
           type: jsPsychSurveyHtmlForm,
           preamble: `
           <div>
-            ${element.description ? `<h5>${element.description}</h5>` : ''}
-            <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
+            <h6>${element.question}${element.mandatory ? '*' : ''}</h6>            
+            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
           </div>`,
           html: `
           <div>
@@ -297,11 +297,6 @@ export async function run({
   window.addEventListener('beforeunload', (event) => {
     // Call the save data function
     onFinish(jsPsych.data.get(), input.appSettings);
-
-    // Display a warning message (optional, but gives the participant a chance to stay)
-    event.preventDefault();
-    // eslint-disable-next-line no-param-reassign
-    event.returnValue = ''; // This line triggers the confirmation dialog in most browsers
   });
 
   const jsPsychTimeline: Timeline = [];
