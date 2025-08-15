@@ -10,8 +10,14 @@ type AllSettingsType = AppSettings;
 
 // default values for the data property of settings by name
 const defaultSettingsValues: AllSettingsType = {
-  sectionSettings: {
-    sections: [[]],
+  surveySettings: {
+    survey: [],
+    pageButtonSettings: {
+      finishSurveyText: 'Submit',
+      nextPageText: 'Continue',
+      previousPageText: 'Previous',
+      continueButtonDelay: 0,
+    },
   },
   fullScreenSettings: {
     fullScreen: false,
@@ -22,12 +28,13 @@ const defaultSettingsValues: AllSettingsType = {
     title: '',
     description: '',
     link: '',
+    linkText: '',
   },
 };
 
 // list of the settings names
 const ALL_SETTING_NAMES = [
-  'sectionSettings',
+  'surveySettings',
   'fullScreenSettings',
   'nextStepSettings',
 ] as const;

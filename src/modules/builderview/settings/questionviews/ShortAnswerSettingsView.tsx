@@ -1,10 +1,20 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { FormControlLabel, MenuItem, Switch, TextField } from '@mui/material';
+import {
+  FormControlLabel,
+  MenuItem,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import Stack from '@mui/material/Stack';
 
-import { ShortAnswer } from '@/modules/config/AppSettings';
+import {
+  AnswerTypeOption,
+  ShortAnswer,
+  answerTypeOptionsArray,
+} from '@/modules/config/AppSettings';
 
 type ShortAnswerSettingsViewProps = {
   questionObject: ShortAnswer;
@@ -18,7 +28,91 @@ const ShortAnswerSettingsView: FC<ShortAnswerSettingsViewProps> = ({
   const { t } = useTranslation('translations', {
     keyPrefix: 'SETTINGS.SECTIONS',
   });
-  const { question, description, mandatory, answerType } = questionObject;
+  const { question, description, mandatory, answerType, dataValidation } =
+    questionObject;
+
+  let dataValidationElement: ReactNode;
+  switch (answerType) {
+    case 'number':
+      dataValidationElement = (
+        <Stack spacing={1}>
+          <Typography variant="h6">{t(`DATA_VALIDATION_TITLE`)}</Typography>
+          <Typography variant="body1">
+            {t(`DATA_VALIDATION_DESCRIPTION_NUMBER`)}
+          </Typography>
+          <TextField
+            label={t('DATA_VALIDATION_MIN_LABEL_NUMBER')}
+            type="number"
+            value={dataValidation?.min ? dataValidation.min : ''}
+            onChange={(e) =>
+              onChange({
+                ...questionObject,
+                dataValidation: {
+                  ...dataValidation,
+                  min: Number(e.target.value),
+                },
+              })
+            }
+          />
+          <TextField
+            label={t('DATA_VALIDATION_MAX_LABEL_NUMBER')}
+            type="number"
+            value={dataValidation?.max ? dataValidation.max : ''}
+            onChange={(e) =>
+              onChange({
+                ...questionObject,
+                dataValidation: {
+                  ...dataValidation,
+                  max: Number(e.target.value),
+                },
+              })
+            }
+          />
+        </Stack>
+      );
+      break;
+    case 'date':
+    case 'month':
+      dataValidationElement = (
+        <Stack>
+          <Typography variant="h6">{t(`DATA_VALIDATION_TITLE`)}</Typography>
+          <Typography variant="body1">
+            {t(`DATA_VALIDATION_DESCRIPTION_NUMBER`)}
+          </Typography>
+          <TextField
+            label={t('DATA_VALIDATION_MIN_LABEL_NUMBER')}
+            type={answerType}
+            value={dataValidation?.min ? dataValidation.min : ''}
+            onChange={(e) =>
+              onChange({
+                ...questionObject,
+                dataValidation: {
+                  ...dataValidation,
+                  min: e.target.value,
+                },
+              })
+            }
+          />
+          <TextField
+            label={t('DATA_VALIDATION_MAX_LABEL_NUMBER')}
+            type={answerType}
+            value={dataValidation?.max ? dataValidation.max : ''}
+            onChange={(e) =>
+              onChange({
+                ...questionObject,
+                dataValidation: {
+                  ...dataValidation,
+                  max: e.target.value,
+                },
+              })
+            }
+          />
+        </Stack>
+      );
+      break;
+    default:
+      break;
+  }
 
   return (
     <Stack spacing={1}>
@@ -51,14 +145,20 @@ const ShortAnswerSettingsView: FC<ShortAnswerSettingsViewProps> = ({
         onChange={(e) =>
           onChange({
             ...questionObject,
-            answerType: e.target.value as 'number' | 'text' | 'date',
+            answerType: e.target.value as AnswerTypeOption,
           })
         }
       >
-        <MenuItem value="text">{t('TEXT_TYPE_LABEL')}</MenuItem>
-        <MenuItem value="number">{t('NUMBER_TYPE_LABEL')}</MenuItem>
-        <MenuItem value="date">{t('DATE_TYPE_LABEL')}</MenuItem>
+        {answerTypeOptionsArray.map((answerTypeOption, index) => (
+          <MenuItem key={index} value={answerTypeOption}>
+            {
+              // @ts-ignore
+              t(`TYPE_LABEL_${answerTypeOption}`)
+            }
+          </MenuItem>
+        ))}
       </TextField>
+      {dataValidationElement}
     </Stack>
   );
 };

@@ -16,9 +16,8 @@ import Typography from '@mui/material/Typography';
 import { format } from 'date-fns';
 import { DataCollection } from 'jspsych';
 
-import { hooks } from '@/config/queryClient';
+import useSurveyResults from '@/modules/context/SurveyContext';
 
-import { ExperimentResult } from '../../config/AppResults';
 import ResultsRow from './ResultsRow';
 
 const downloadJson: (json: string, filename: string) => void = (
@@ -37,11 +36,11 @@ const downloadJson: (json: string, filename: string) => void = (
 };
 
 const ResultsView: FC = () => {
-  const { data: appData } = hooks.useAppData<ExperimentResult>();
+  const { allSurveyResultsAppData } = useSurveyResults();
 
   const allData = (): string => {
     const completeJSON: string[] = [];
-    appData?.forEach((data) => {
+    allSurveyResultsAppData?.forEach((data) => {
       const experimentJSON = data.data.rawData
         ? new DataCollection(data.data.rawData.trials)
         : undefined;
@@ -83,7 +82,7 @@ const ResultsView: FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {appData?.map((data) => {
+            {allSurveyResultsAppData?.map((data) => {
               const rawData = data.data.rawData
                 ? new DataCollection(data.data.rawData.trials)
                 : undefined;
@@ -92,13 +91,13 @@ const ResultsView: FC = () => {
                   key={data.id}
                   name={data.creator?.name}
                   numberOfPages={
-                    data.data.settings?.sectionSettings.sections.length
+                    data.data.settings?.surveySettings.survey.length
                   }
                   length={rawData ? rawData.count() : 0}
                   rawDataDownload={() =>
                     downloadJson(
                       rawData ? rawData.json() : '[]',
-                      `numerosity_${data.creator?.name}_${data.updatedAt}_${format(new Date(), 'yyyyMMdd_HH.mm')}.json`,
+                      `surveyapp_${data.creator?.name}_${data.updatedAt}_${format(new Date(), 'yyyyMMdd_HH.mm')}.json`,
                     )
                   }
                 />

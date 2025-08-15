@@ -1,14 +1,13 @@
 export type AppSettings = {
-  sectionSettings: SectionSettings;
+  surveySettings: SurveySettings;
   fullScreenSettings: FullScreenSettings;
   nextStepSettings: NextStepSettings;
 };
 
-export type SectionSettings = {
-  sections: Section[];
+export type SurveySettings = {
+  survey: SurveyElement[];
+  pageButtonSettings: PageButtonSettings;
 };
-
-export type Section = SurveyElement[];
 
 export enum QuestionTypes {
   ShortAnswer = 'shortAnswer',
@@ -27,14 +26,23 @@ export type SurveyElementType = QuestionTypes | OtherElementType;
 export type ShortAnswer = {
   type: QuestionTypes.ShortAnswer;
   question: string;
+  name: string;
   description: string;
   mandatory: boolean;
-  answerType: 'number' | 'text' | 'date';
+  answerType: AnswerTypeOption;
+  dataValidation?: {
+    min?: number | string;
+    max?: number | string;
+  };
 };
+
+export type AnswerTypeOptions = typeof answerTypeOptionsArray;
+export type AnswerTypeOption = AnswerTypeOptions[number];
 
 export type LongAnswer = {
   type: QuestionTypes.LongAnswer;
   question: string;
+  name: string;
   description: string;
   mandatory: boolean;
 };
@@ -42,6 +50,7 @@ export type LongAnswer = {
 export type MultipleChoice = {
   type: QuestionTypes.MultipleChoice;
   question: string;
+  name: string;
   description: string;
   mandatory: boolean;
   answers: string[];
@@ -50,6 +59,7 @@ export type MultipleChoice = {
 export type MultiAnswer = {
   type: QuestionTypes.MultiAnswer;
   question: string;
+  name: string;
   description: string;
   mandatory: boolean;
   answers: string[];
@@ -58,6 +68,7 @@ export type MultiAnswer = {
 export type LikertScale = {
   type: QuestionTypes.LikertScale;
   question: string;
+  name: string;
   description: string;
   mandatory: boolean;
   scale: string[];
@@ -72,12 +83,19 @@ export type Question =
 
 export type TextElement = {
   type: OtherElementType.Text;
+  name: string;
   title: string;
   description: string;
-  continueButtonText: string;
 };
 
 export type SurveyElement = Question | TextElement;
+
+export type PageButtonSettings = {
+  nextPageText: string;
+  previousPageText: string;
+  finishSurveyText: string;
+  continueButtonDelay: number;
+};
 
 export type FullScreenSettings = {
   fullScreen: boolean;
@@ -89,4 +107,7 @@ export type NextStepSettings = {
   title: string;
   description: string;
   link: string;
+  linkText: string;
 };
+
+export const answerTypeOptionsArray = ['number', 'text', 'date', 'month'];

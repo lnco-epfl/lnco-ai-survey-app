@@ -1,12 +1,24 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import ReactQuill from 'react-quill';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import 'react-quill/dist/quill.snow.css';
 
-import { Box, TextField, Typography } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  BlockTypeSelect,
+  BoldItalicUnderlineToggles,
+  ListsToggle,
+  MDXEditor,
+  UndoRedo,
+  headingsPlugin,
+  listsPlugin,
+  toolbarPlugin,
+} from '@mdxeditor/editor';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import '@mdxeditor/editor/style.css';
 
 // Import Quill styles
 import { TextElement } from '@/modules/config/AppSettings';
@@ -23,7 +35,7 @@ const TextElementSettingsView: FC<TextElementSettingsViewProps> = ({
   const { t } = useTranslation('translations', {
     keyPrefix: 'SETTINGS.SECTIONS',
   });
-  const { title, description, continueButtonText } = textElement;
+  const { title, description } = textElement;
 
   return (
     <Stack spacing={2}>
@@ -36,43 +48,28 @@ const TextElementSettingsView: FC<TextElementSettingsViewProps> = ({
         <Typography variant="body2" component="label" color="textSecondary">
           {t('DESCRIPTION_LABEL')}
         </Typography>
-        <Box
-          sx={{
-            '.ql-editor': {
-              minHeight: '150px',
-              fontSize: '1rem',
-              color: 'text.primary',
-              padding: '10px',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: '4px',
-            },
-          }}
-        >
-          <ReactQuill
-            value={description}
-            onChange={(value) =>
-              onChange({ ...textElement, description: value })
-            }
-            theme="snow"
-            modules={{
-              toolbar: [
-                [{ header: [1, 2, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ list: 'ordered' }, { list: 'bullet' }],
-                ['link'],
-              ],
-            }}
-          />
-        </Box>
+        <MDXEditor
+          markdown={description}
+          onChange={(value) => onChange({ ...textElement, description: value })}
+          plugins={[
+            headingsPlugin(),
+            toolbarPlugin({
+              toolbarClassName: 'my-classname',
+              // eslint-disable-next-line react/no-unstable-nested-components
+              toolbarContents: () => (
+                <>
+                  {' '}
+                  <BlockTypeSelect />
+                  <UndoRedo />
+                  <BoldItalicUnderlineToggles />
+                  <ListsToggle />
+                </>
+              ),
+            }),
+            listsPlugin(),
+          ]}
+        />
       </Stack>
-      <TextField
-        value={continueButtonText}
-        label={t('CONTINUE_BUTTON_TEXT_LABEL')} // Assuming you want to use the same label here
-        onChange={(e) =>
-          onChange({ ...textElement, continueButtonText: e.target.value })
-        }
-      />
     </Stack>
   );
 };
