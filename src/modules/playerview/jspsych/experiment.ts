@@ -132,7 +132,6 @@ const buildTimelineFromSurvey = (
             </div>
           </div>`;
         break;
-
       case QuestionTypes.MultiAnswer:
         combinedHTML += `
           <div class="question-block">
