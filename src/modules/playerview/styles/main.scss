@@ -316,7 +316,15 @@ body {
    BUTTONS
    ========================================================================== */
 
-.jspsych-btn {
+/* Center the button container */
+.jspsych-survey-html-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* .jspsych-btn {
   font-family: 'Futura', 'Century Gothic', 'Avenir', 'Helvetica', sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
@@ -333,19 +341,113 @@ body {
   display: block;
   width: auto;
   max-width: 180px;
+} */
+
+.jspsych-btn,
+input[type='submit'],
+button[type='submit'],
+.jspsych-survey-html-form input[type='submit'] {
+  font-family: 'Futura', 'Century Gothic', 'Avenir', 'Helvetica', sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.15em !important;
+
+  /* Button sizing and spacing */
+  padding: 15px 40px !important;
+  margin: 30px auto !important;
+  min-width: 180px !important;
+
+  /* Visual styling */
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 0 !important;
+
+  /* Layout */
+  display: block !important;
+  text-align: center !important;
+  cursor: pointer !important;
+
+  /* Animation */
+  transition: all 0.3s ease !important;
+
+  /* Remove any default styling */
+  box-shadow: none !important;
+  outline: none !important;
 }
 
-.jspsych-btn:hover {
-  background-color: #ffffff;
-  color: #000000;
-  border: 2px solid #000000;
+/* Hover state */
+.jspsych-btn:hover,
+input[type='submit']:hover,
+button[type='submit']:hover,
+.jspsych-survey-html-form input[type='submit']:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
-.jspsych-btn:disabled {
-  background-color: #cccccc;
-  color: #666666;
-  border-color: #cccccc;
-  cursor: not-allowed;
+.jspsych-btn:focus,
+input[type='submit']:focus,
+button[type='submit']:focus,
+.jspsych-survey-html-form input[type='submit']:focus {
+  background-color: #333333 !important;
+  color: #ffffff !important;
+  border: 2px solid #333333 !important;
+  outline: 2px solid #666666 !important;
+  outline-offset: 2px !important;
+}
+
+/* Disabled state */
+.jspsych-btn:disabled,
+input[type='submit']:disabled,
+button[type='submit']:disabled,
+.jspsych-survey-html-form input[type='submit']:disabled {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  border-color: #cccccc !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Center the form and its contents */
+.jspsych-display-element form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Ensure the submit button container is centered */
+.jspsych-survey-html-form > input[type='submit'],
+form > input[type='submit'] {
+  align-self: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Additional centering for button wrapper if it exists */
+.jspsych-survey-html-form-question,
+.jspsych-survey-html-form-response {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* For any button wrapper divs */
+div:has(> input[type='submit']),
+div:has(> button[type='submit']),
+div:has(> .jspsych-btn) {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 20px 0;
 }
 
 /* ==========================================================================
