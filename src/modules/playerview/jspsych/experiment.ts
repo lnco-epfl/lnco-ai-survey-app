@@ -1,8 +1,6 @@
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import jsPsychSurveyHtmlForm from '@jspsych/plugin-survey-html-form';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Marked, Renderer } from '@ts-stack/markdown';
 import { DataCollection, JsPsych, initJsPsych } from 'jspsych';
 
@@ -56,40 +54,6 @@ Marked.setOptions({
 });
 
 //= ==========================================================================================
-// GLOBAL FUNCTIONS
-//= ==========================================================================================
-
-/**
- * @brief Global function for handling Likert scale selection
- * @param clickedLabel The label element that was clicked
- *
- * This function manages the visual selection state for Likert scale questions.
- * It removes the selected class from all labels in the question group and
- * adds it to the clicked label, then checks the corresponding radio button.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(window as any).selectLikert = function selectLikert(
-  clickedLabel: HTMLElement,
-) {
-  const container = clickedLabel.closest('.question-options');
-  if (container) {
-    const allLabels = container.querySelectorAll('label');
-    allLabels.forEach((label) => {
-      label.classList.remove('selected');
-    });
-  }
-
-  clickedLabel.classList.add('selected');
-
-  const radio = clickedLabel.querySelector(
-    'input[type="radio"]',
-  ) as HTMLInputElement;
-  if (radio) {
-    radio.checked = true;
-  }
-};
-
-//= ==========================================================================================
 // UTILITY FUNCTIONS
 //= ==========================================================================================
 
@@ -112,6 +76,53 @@ const getResult = (
     });
   }
   return answer;
+};
+
+/**
+ * @brief Sets up event listeners for Likert scale interactions
+ * @param container The container element containing Likert scale questions
+ */
+const setupLikertInteractions = (container: HTMLElement): void => {
+  const likertContainers = container.querySelectorAll('.likert-horizontal');
+
+  likertContainers.forEach((likertContainer) => {
+    const labels = likertContainer.querySelectorAll('label');
+
+    labels.forEach((label) => {
+      label.addEventListener('click', () => {
+        // Remove selected class from all labels in this question group
+        const allLabels = likertContainer.querySelectorAll('label');
+        allLabels.forEach((l) => l.classList.remove('selected'));
+
+        // Add selected class to clicked label
+        label.classList.add('selected');
+
+        // Check the radio button
+        const radio = label.querySelector(
+          'input[type="radio"]',
+        ) as HTMLInputElement;
+        if (radio) {
+          radio.checked = true;
+        }
+      });
+    });
+  });
+};
+
+/**
+ * @brief Initializes already-selected Likert scale options on page load
+ * @param container The container element containing Likert scale questions
+ */
+const initializeLikertSelections = (container: HTMLElement): void => {
+  const checkedRadios = container.querySelectorAll(
+    '.likert-horizontal input[type="radio"]:checked',
+  );
+  checkedRadios.forEach((radio) => {
+    const label = radio.closest('label');
+    if (label) {
+      label.classList.add('selected');
+    }
+  });
 };
 
 /**
@@ -192,21 +203,7 @@ const buildQuestionHTML = (
           </div>
         </div>`;
 
-    case QuestionTypes.LikertScale: {
-      const initScript = `
-        <script>
-          setTimeout(function() {
-            const checkedRadios = document.querySelectorAll('.likert-horizontal input[type="radio"]:checked');
-            checkedRadios.forEach(radio => {
-              const label = radio.closest('label');
-              if (label) {
-                label.classList.add('selected');
-              }
-            });
-          }, 100);
-        </script>
-      `;
-
+    case QuestionTypes.LikertScale:
       return `
         <div class="question-block">
           <h1 class="question-title">${element.question}${element.mandatory ? '<span class="required-mark">*</span>' : ''}</h1>
@@ -215,7 +212,7 @@ const buildQuestionHTML = (
             ${element.scale
               .map(
                 (answer: string) => `
-                <label onclick="selectLikert(this, '${element.name}')">
+                <label>
                   <input 
                     type="radio" 
                     name="${element.name}" 
@@ -229,9 +226,7 @@ const buildQuestionHTML = (
               )
               .join('')}
           </div>
-        </div>
-        ${initScript}`;
-    }
+        </div>`;
 
     case OtherElementType.Text:
       return `
@@ -296,6 +291,15 @@ const buildSeparatePagesTimeline = (
         type: jsPsychSurveyHtmlForm,
         preamble: '',
         html: buildQuestionHTML(element, result),
+        on_load() {
+          // Set up Likert interactions after the page loads
+          const container = document.getElementById('jspsych-content');
+          if (container) {
+            setupLikertInteractions(container);
+            // Initialize any pre-selected options
+            setTimeout(() => initializeLikertSelections(container), 100);
+          }
+        },
         on_finish(data: ResponseElement) {
           // eslint-disable-next-line no-param-reassign
           data.name = element.name;
@@ -338,27 +342,19 @@ const buildCombinedPageTimeline = (
     combinedHTML += buildQuestionHTML(element, result);
   });
 
-  // Add script to initialize Likert scale selections
-  const initializeLikertScript = `
-    <script>
-      setTimeout(function() {
-        const checkedRadios = document.querySelectorAll('.likert-horizontal input[type="radio"]:checked');
-        checkedRadios.forEach(radio => {
-          const label = radio.closest('label');
-          if (label) {
-            label.classList.add('selected');
-          }
-        });
-      }, 100);
-    </script>
-`;
-
-  combinedHTML += initializeLikertScript;
-
   timeline.push({
     type: jsPsychSurveyHtmlForm,
     preamble: '',
     html: combinedHTML,
+    on_load() {
+      // Set up Likert interactions after the page loads
+      const container = document.getElementById('jspsych-content');
+      if (container) {
+        setupLikertInteractions(container);
+        // Initialize any pre-selected options
+        setTimeout(() => initializeLikertSelections(container), 100);
+      }
+    },
     on_finish(data: ResponseElement) {
       // eslint-disable-next-line no-param-reassign
       data.name = 'combined_survey';
