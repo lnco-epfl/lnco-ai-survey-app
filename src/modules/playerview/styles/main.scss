@@ -11,7 +11,6 @@
     background-color: #fffefe;
   }
 
-  /* Ensure content is properly positioned in fullscreen */
   .jspsych-display-element {
     padding-top: 90px !important;
   }
@@ -292,7 +291,7 @@ body {
   align-items: center;
   height: 60vh;
   text-align: center;
-  padding-top: 80px; /* Account for progress bar */
+  padding-top: 80px;
 }
 
 .jspsych-fullscreen-stimulus div {
