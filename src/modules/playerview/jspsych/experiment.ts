@@ -35,6 +35,32 @@ Marked.setOptions({
   smartypants: false,
 });
 
+// Define the selectLikert function globally
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).selectLikert = function selectLikert(
+  clickedLabel: HTMLElement,
+) {
+  // Remove selected class from all labels in this question group
+  const container = clickedLabel.closest('.question-options');
+  if (container) {
+    const allLabels = container.querySelectorAll('label');
+    allLabels.forEach((label) => {
+      label.classList.remove('selected');
+    });
+  }
+
+  // Add selected class to clicked label
+  clickedLabel.classList.add('selected');
+
+  // Check the radio button
+  const radio = clickedLabel.querySelector(
+    'input[type="radio"]',
+  ) as HTMLInputElement;
+  if (radio) {
+    radio.checked = true;
+  }
+};
+
 const getResult = (
   result: ExperimentResult | undefined,
   name: string,
@@ -57,97 +83,62 @@ const buildTimelineFromSurvey = (
   onFinish: (data: DataCollection, settings: AppSettings) => void,
 ): Timeline => {
   const timeline: Timeline = [];
-  settings.surveySettings.survey.forEach((element, index) => {
-    // Initialize an array to hold all questions for this page
+
+  // Build all questions with their inputs together
+  let combinedHTML = '';
+
+  settings.surveySettings.survey.forEach((element) => {
     switch (element.type) {
       case QuestionTypes.ShortAnswer:
-        timeline.push({
-          type: jsPsychSurveyHtmlForm,
-          preamble: `
-          <div>
-            <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
-            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
-          </div>`,
-          html: `<input type="${element.answerType}" ${element.dataValidation?.min ? `min="${element.dataValidation?.min}"` : ''} ${element.dataValidation?.max ? `max="${element.dataValidation?.max}"` : ''} value="${result ? getResult(result, element.name) : ''}" name="${element.name}" id="task-input" ${element.mandatory ? 'required' : ''} /><br>`,
-          on_finish(data: ResponseElement) {
-            // eslint-disable-next-line no-param-reassign
-            data.name = element.name;
-            onFinish(jsPsych.data.get(), settings);
-            // eslint-disable-next-line no-param-reassign
-            jsPsych.progressBar!.progress =
-              (index + 1) / settings.surveySettings.survey.length;
-          },
-        });
+        combinedHTML += `
+          <div class="question-block">
+            <h1 class="question-title">${element.question}${element.mandatory ? '<span class="required-mark">*</span>' : ''}</h1>
+            ${element.description ? `<p class="question-description">${element.description}</p>` : ''}
+            <input type="${element.answerType}" ${element.dataValidation?.min ? `min="${element.dataValidation?.min}"` : ''} ${element.dataValidation?.max ? `max="${element.dataValidation?.max}"` : ''} value="${result ? getResult(result, element.name) : ''}" name="${element.name}" ${element.mandatory ? 'required' : ''} />
+          </div>`;
         break;
 
       case QuestionTypes.LongAnswer:
-        timeline.push({
-          type: jsPsychSurveyHtmlForm,
-          preamble: `
-          <div>
-            <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
-            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
-          </div>`,
-          html: `<input value="${getResult(result, element.name)}" name="${element.name}" id="task-input" ${element.mandatory ? 'required' : ''} rows="5"><br>`,
-          on_finish(data: ResponseElement) {
-            // eslint-disable-next-line no-param-reassign
-            data.name = element.name;
-            onFinish(jsPsych.data.get(), settings);
-            // eslint-disable-next-line no-param-reassign
-            jsPsych.progressBar!.progress =
-              (index + 1) / settings.surveySettings.survey.length;
-          },
-        });
+        combinedHTML += `
+          <div class="question-block">
+            <h1 class="question-title">${element.question}${element.mandatory ? '<span class="required-mark">*</span>' : ''}</h1>
+            ${element.description ? `<p class="question-description">${element.description}</p>` : ''}
+            <textarea name="${element.name}" ${element.mandatory ? 'required' : ''} rows="5" placeholder="Type your response here...">${getResult(result, element.name)}</textarea>
+          </div>`;
         break;
 
       case QuestionTypes.MultipleChoice:
-        timeline.push({
-          type: jsPsychSurveyHtmlForm,
-          preamble: `
-          <div>
-            <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
-            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
-          </div>`,
-          html: `
-          <div>
-            ${element.answers
-              .map(
-                (answer) => `
-                <label>
-                  <input 
-                    type="radio" 
-                    name="${element.name}" 
-                    value="${answer}" 
-                    ${getResult(result, element.name) === answer ? 'checked' : ''}
-                    ${element.mandatory ? 'required' : ''}
-                  >
-                  ${answer}
-                </label><br>
-              `,
-              )
-              .join('')}
-          </div>`,
-          on_finish(data: ResponseElement) {
-            // eslint-disable-next-line no-param-reassign
-            data.name = element.name;
-            onFinish(jsPsych.data.get(), settings);
-            // eslint-disable-next-line no-param-reassign
-            jsPsych.progressBar!.progress =
-              (index + 1) / settings.surveySettings.survey.length;
-          },
-        });
+        combinedHTML += `
+          <div class="question-block">
+            <h1 class="question-title">${element.question}${element.mandatory ? '<span class="required-mark">*</span>' : ''}</h1>
+            ${element.description ? `<p class="question-description">${element.description}</p>` : ''}
+            <div class="question-options">
+              ${element.answers
+                .map(
+                  (answer) => `
+                  <label>
+                    <input 
+                      type="radio" 
+                      name="${element.name}" 
+                      value="${answer}" 
+                      ${getResult(result, element.name) === answer ? 'checked' : ''}
+                      ${element.mandatory ? 'required' : ''}
+                    >
+                    ${answer}
+                  </label>
+                `,
+                )
+                .join('')}
+            </div>
+          </div>`;
         break;
 
       case QuestionTypes.MultiAnswer:
-        timeline.push({
-          type: jsPsychSurveyHtmlForm,
-          preamble: `
-          <div>
-            <h6>${element.question}${element.mandatory ? '*' : ''}</h6>
-            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
-          </div>`,
-          html: `
-            <div>
+        combinedHTML += `
+          <div class="question-block">
+            <h1 class="question-title">${element.question}${element.mandatory ? '<span class="required-mark">*</span>' : ''}</h1>
+            ${element.description ? `<p class="question-description">${element.description}</p>` : ''}
+            <div class="question-options">
               ${element.answers
                 .map(
                   (answer) => `
@@ -160,85 +151,46 @@ const buildTimelineFromSurvey = (
                       ${element.mandatory ? 'required' : ''}
                     >
                     ${answer}
-                  </label><br>
+                  </label>
                 `,
                 )
                 .join('')}
-            </div>`,
-          on_finish(data: ResponseElement) {
-            // eslint-disable-next-line no-param-reassign
-            data.name = element.name;
-            onFinish(jsPsych.data.get(), settings);
-            // eslint-disable-next-line no-param-reassign
-            jsPsych.progressBar!.progress =
-              (index + 1) / settings.surveySettings.survey.length;
-          },
-        });
+            </div>
+          </div>`;
         break;
 
       case QuestionTypes.LikertScale:
-        timeline.push({
-          type: jsPsychSurveyHtmlForm,
-          preamble: `
-          <div>
-            <h6>${element.question}${element.mandatory ? '*' : ''}</h6>            
-            ${element.description ? `<p><i>${element.description}</i></p>` : ''}
-          </div>`,
-          html: `
-          <div>
-            ${element.scale
-              .map(
-                (answer) => `
-                <label>
-                  <input 
-                    type="radio" 
-                    name="${element.name}" 
-                    value="${answer}" 
-                    ${getResult(result, element.name) === answer ? 'checked' : ''}
-                    ${element.mandatory ? 'required' : ''}
-                  >
-                  ${answer}
-                </label><br>
-              `,
-              )
-              .join('')}
-          </div>`,
-          on_finish(data: ResponseElement) {
-            // eslint-disable-next-line no-param-reassign
-            data.name = element.name;
-            onFinish(jsPsych.data.get(), settings);
-            // eslint-disable-next-line no-param-reassign
-            jsPsych.progressBar!.progress =
-              (index + 1) / settings.surveySettings.survey.length;
-          },
-        });
+        combinedHTML += `
+          <div class="question-block">
+            <h1 class="question-title">${element.question}${element.mandatory ? '<span class="required-mark">*</span>' : ''}</h1>
+            ${element.description ? `<p class="question-description">${element.description}</p>` : ''}
+            <div class="question-options likert-horizontal" data-question="${element.name}">
+              ${element.scale
+                .map(
+                  (answer) => `
+                  <label onclick="selectLikert(this, '${element.name}')">
+                    <input 
+                      type="radio" 
+                      name="${element.name}" 
+                      value="${answer}" 
+                      ${getResult(result, element.name) === answer ? 'checked' : ''}
+                      ${element.mandatory ? 'required' : ''}
+                    >
+                    <span>${answer}</span>
+                  </label>
+                `,
+                )
+                .join('')}
+            </div>
+          </div>`;
         break;
 
       case OtherElementType.Text:
-        timeline.push({
-          type: jsPsychSurveyHtmlForm,
-          html: `<div><h2>${element.title}</h2><p>${Marked.parse(element.description)}</p></div>`,
-          on_load() {
-            const button = document.getElementById(
-              'jspsych-survey-html-form-next',
-            ) as HTMLButtonElement;
-            if (
-              settings.surveySettings.pageButtonSettings.continueButtonDelay >
-                0 &&
-              button
-            ) {
-              button.disabled = true;
-              setTimeout(() => {
-                button.disabled = false;
-              }, settings.surveySettings.pageButtonSettings.continueButtonDelay * 1000);
-            }
-          },
-          on_finish() {
-            // eslint-disable-next-line no-param-reassign
-            jsPsych.progressBar!.progress =
-              (index + 1) / settings.surveySettings.survey.length;
-          },
-        });
+        combinedHTML += `
+          <div class="question-block text-block">
+            <h1 class="text-title">${element.title}</h1>
+            <div class="text-content">${Marked.parse(element.description)}</div>
+          </div>`;
         break;
 
       default:
@@ -246,11 +198,44 @@ const buildTimelineFromSurvey = (
         break;
     }
   });
+
+  // Initialize any pre-selected values - this will run after the HTML is inserted
+  const initializeLikertScript = `
+    <script>
+      // Initialize any pre-selected values on page load
+      setTimeout(function() {
+        const checkedRadios = document.querySelectorAll('.likert-horizontal input[type="radio"]:checked');
+        checkedRadios.forEach(radio => {
+          const label = radio.closest('label');
+          if (label) {
+            label.classList.add('selected');
+          }
+        });
+      }, 100);
+    </script>
+`;
+
+  // Add the initialization script to the end of your combinedHTML
+  combinedHTML += initializeLikertScript;
+
+  // Create a single timeline item with all questions and their inputs together
+  timeline.push({
+    type: jsPsychSurveyHtmlForm,
+    preamble: '', // No separate preamble needed
+    html: combinedHTML,
+    on_finish(data: ResponseElement) {
+      // eslint-disable-next-line no-param-reassign
+      data.name = 'combined_survey';
+      onFinish(jsPsych.data.get(), settings);
+      // eslint-disable-next-line no-param-reassign
+      jsPsych.progressBar!.progress = 1;
+    },
+  });
+
   return timeline;
 };
 
 /**
- *
  * @returns Returns a simple welcome screen that automatically triggers fullscreen when the start button is pressed
  */
 const getFullScreenTrial = (): Trial => ({
@@ -259,6 +244,10 @@ const getFullScreenTrial = (): Trial => ({
   message:
     '<div style="text-align: center; font-size: 24px;">Begin the Experiment</div>',
   fullscreen_mode: true,
+  on_finish: () => {
+    // Scroll to top when entering fullscreen to ensure content is visible
+    window.scrollTo(0, 0);
+  },
 });
 
 /**
@@ -294,7 +283,7 @@ export async function run({
   });
 
   // Add an event listener for the `beforeunload` event
-  window.addEventListener('beforeunload', (event) => {
+  window.addEventListener('beforeunload', () => {
     // Call the save data function
     onFinish(jsPsych.data.get(), input.appSettings);
   });
