@@ -126,6 +126,100 @@ const initializeLikertSelections = (container: HTMLElement): void => {
 };
 
 /**
+ * @brief Implements continue button delay functionality using jsPsych's DOM structure
+ * @param delaySeconds Number of seconds to delay the button
+ * @param buttonText Text to show on the button
+ */
+const implementContinueDelay = (
+  delaySeconds: number,
+  buttonText: string,
+): void => {
+  if (delaySeconds <= 0) {
+    return; // No delay needed
+  }
+
+  let remainingTime = delaySeconds;
+  let countdownInterval: NodeJS.Timeout | null = null;
+
+  const updateButton = (): boolean => {
+    // Look for the button in jsPsych's content area
+    const button =
+      (document.querySelector(
+        '#jspsych-content input[type="submit"]',
+      ) as HTMLInputElement) ||
+      (document.querySelector(
+        '#jspsych-content .jspsych-btn',
+      ) as HTMLInputElement) ||
+      (document.querySelector(
+        '.jspsych-survey-html-form input[type="submit"]',
+      ) as HTMLInputElement);
+
+    if (button) {
+      if (remainingTime > 0) {
+        button.disabled = true;
+        button.value = buttonText; // Keep original text, no timer display
+        button.style.opacity = '0.5';
+        button.style.cursor = 'not-allowed';
+        button.style.pointerEvents = 'none';
+      } else {
+        button.disabled = false;
+        button.value = buttonText;
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
+        button.style.pointerEvents = 'auto';
+      }
+      return true; // Button found and updated
+    }
+    return false; // Button not found
+  };
+
+  // Try to find and disable button immediately
+  const buttonFound = updateButton();
+
+  function startCountdown(): void {
+    countdownInterval = setInterval(() => {
+      remainingTime -= 1;
+      updateButton();
+
+      if (remainingTime <= 0 && countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+    }, 1000);
+  }
+
+  if (!buttonFound) {
+    // If button not found, use MutationObserver to watch for it
+    const observer = new MutationObserver(() => {
+      if (updateButton()) {
+        observer.disconnect(); // Stop observing once button is found
+        startCountdown();
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Fallback: stop observing after 5 seconds
+    setTimeout(() => observer.disconnect(), 5000);
+  } else {
+    startCountdown();
+  }
+
+  // Cleanup function
+  const cleanup = (): void => {
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+  };
+
+  window.addEventListener('beforeunload', cleanup, { once: true });
+};
+
+/**
  * @brief Generates HTML content for different question types
  * @param element Question configuration object
  * @param result Previous experiment results for pre-filling answers
@@ -261,8 +355,16 @@ const buildSeparatePagesTimeline = (
 ): Timeline => {
   const timeline: Timeline = [];
   const totalQuestions = settings.surveySettings.survey.length;
+  const continueDelay =
+    settings.surveySettings.pageButtonSettings.continueButtonDelay;
+  const { nextPageText } = settings.surveySettings.pageButtonSettings;
+  const finishText =
+    settings.surveySettings.pageButtonSettings.finishSurveyText;
 
   settings.surveySettings.survey.forEach((element, index) => {
+    const isLastQuestion = index === totalQuestions - 1;
+    const buttonText = isLastQuestion ? finishText : nextPageText;
+
     if (element.type === OtherElementType.Text) {
       // Text elements use keyboard response with spacebar continuation
       timeline.push({
@@ -280,7 +382,7 @@ const buildSeparatePagesTimeline = (
             jsPsych.progressBar.progress = (index + 1) / totalQuestions;
           }
 
-          if (index === totalQuestions - 1) {
+          if (isLastQuestion) {
             onFinish(jsPsych.data.get(), settings);
           }
         },
@@ -291,14 +393,21 @@ const buildSeparatePagesTimeline = (
         type: jsPsychSurveyHtmlForm,
         preamble: '',
         html: buildQuestionHTML(element, result),
+        button_label: buttonText,
         on_load() {
           // Set up Likert interactions after the page loads
           const container = document.getElementById('jspsych-content');
           if (container) {
             setupLikertInteractions(container);
             // Initialize any pre-selected options
-            setTimeout(() => initializeLikertSelections(container), 100);
+            setTimeout(() => {
+              initializeLikertSelections(container);
+            }, 100);
           }
+
+          // Implement continue button delay only in separate pages mode
+          // Start the delay immediately since we use MutationObserver to find the button
+          implementContinueDelay(continueDelay, buttonText);
         },
         on_finish(data: ResponseElement) {
           // eslint-disable-next-line no-param-reassign
@@ -309,7 +418,7 @@ const buildSeparatePagesTimeline = (
             jsPsych.progressBar.progress = (index + 1) / totalQuestions;
           }
 
-          if (index === totalQuestions - 1) {
+          if (isLastQuestion) {
             onFinish(jsPsych.data.get(), settings);
           }
         },
@@ -336,6 +445,8 @@ const buildCombinedPageTimeline = (
 ): Timeline => {
   const timeline: Timeline = [];
   let combinedHTML = '';
+  const finishText =
+    settings.surveySettings.pageButtonSettings.finishSurveyText;
 
   // Combine all questions into a single HTML string
   settings.surveySettings.survey.forEach((element) => {
@@ -346,13 +457,17 @@ const buildCombinedPageTimeline = (
     type: jsPsychSurveyHtmlForm,
     preamble: '',
     html: combinedHTML,
+    button_label: finishText,
     on_load() {
       // Set up Likert interactions after the page loads
       const container = document.getElementById('jspsych-content');
       if (container) {
         setupLikertInteractions(container);
         // Initialize any pre-selected options
-        setTimeout(() => initializeLikertSelections(container), 100);
+        setTimeout(() => {
+          initializeLikertSelections(container);
+          // No delay in combined mode - button is immediately available
+        }, 100);
       }
     },
     on_finish(data: ResponseElement) {
